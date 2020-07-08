@@ -1,0 +1,147 @@
+/**
+ * https://medium.com/velotio-perspectives/how-to-write-jenkinsfile-for-angular-and-net-based-applications-1cbdbf56f906
+ *//
+dev gv
+CODE_CHANGES = getGitChanges()
+pipeline {
+    //job agent
+    agent { label "windows"}
+    options {
+        disableConcurrentBuilds()
+    }
+    //custom variables
+    environment {
+        START_TIME = new Date().format('yyyy-MM-dd HH:mm:ss')
+    }
+    stages {
+        stage("init and Clean Workspace") {
+            steps {
+                script {
+                    gv = load "script.groovy"
+                }
+                cleanWs()
+            }
+        }
+        stage('Nuget Restore') {
+            steps {
+                bat label: 'Nuget Restore', 
+                script: '''
+                    nuget restore "DotNet Test1\\dotNetFrameworkTest.sln"
+                    echo "Nuget Done Starting Msbuild *************"
+                ''' 
+                }
+            }
+        }
+        /*
+        stage('Environment Setup') {
+            parallel {
+                stage('dev'){
+                    when {
+                        expression {
+                            env.GIT_BRANCH == 'origin/dev' && CODE_CHANGES == true
+                        }
+                    }
+                    environment {
+                        //bind the credentials to your env variables
+                        GSDS_DB_WEB_TEMP_CREDENTIALS = credentials('GSDS_DB_WEB_DEV')
+                        GSDS_DB_CRON_TEMP_CREDENTIALS = credentials('GSDS_DB_CRON_DEV')
+                        GSDS_DB_RO_TEMP_CREDENTIALS = credentials('GSDS_DB_RO_DEV')
+                        GSDS_PCC_DB_TEMP_CREDENTIALS = credentials('GSDS_PCC_DB_DEV')
+                        GSDS_SH_AD_TEMP_CREDENTIALS_PSW = credentials('GSDS_SH_AD_PASSWORD_DEV')
+                    }
+                    steps {
+                        echo "building branch: ${BRANCH_NAME}"
+                        script {
+                            env.GSDS_DB_WEB_CREDENTIALS_PSW = "${GSDS_DB_WEB_TEMP_CREDENTIALS_PSW}"
+                            env.GSDS_DB_WEB_CREDENTIALS_USR = "${GSDS_DB_WEB_TEMP_CREDENTIALS_USR}"
+                            env.GSDS_DB_CRON_CREDENTIALS_PSW = "${GSDS_DB_CRON_TEMP_CREDENTIALS_PSW}"
+                            env.GSDS_DB_CRON_CREDENTIALS_USR = "${GSDS_DB_CRON_TEMP_CREDENTIALS_USR}"
+                            env.GSDS_DB_RO_CREDENTIALS_PSW = "${GSDS_DB_RO_TEMP_CREDENTIALS_PSW}"
+                            env.GSDS_DB_RO_CREDENTIALS_USR = "${GSDS_DB_RO_TEMP_CREDENTIALS_USR}"
+                            env.GSDS_PCC_DB_CREDENTIALS_PSW = "${GSDS_PCC_DB_TEMP_CREDENTIALS_PSW}"
+                            env.GSDS_PCC_DB_CREDENTIALS_USR = "${GSDS_PCC_DB_TEMP_CREDENTIALS_USR}"
+                            env.GSDS_SH_AD_CREDENTIALS_PSW = "${GSDS_SH_AD_TEMP_CREDENTIALS_PSW}"
+                            env.DEPLOY_FQDN = 'gsds-d2s1.corp.good-sam.com'
+                            env.GSDS_CONFIG_FILE = 'dev.conf'
+                        }
+                    }
+                }
+                
+            }
+        }
+        */
+        stage('Build') {
+            steps {
+                script {
+                    gv.buildApp()
+                }
+            }
+            
+        }
+        stage('Inject Credentials') {
+            /*
+            steps {
+                sh """
+                    set +x
+                    sed -i -e \"s/JENKINS_INJECTED_WEB_USERNAME/${GSDS_DB_WEB_CREDENTIALS_USR}/g\" scripts/config/${GSDS_CONFIG_FILE}
+                    sed -i -e \"s/JENKINS_INJECTED_WEB_PASSWORD/${GSDS_DB_WEB_CREDENTIALS_PSW}/g\" scripts/config/${GSDS_CONFIG_FILE}
+                    sed -i -e \"s/JENKINS_INJECTED_CRON_USERNAME/${GSDS_DB_CRON_CREDENTIALS_USR}/g\" scripts/config/${GSDS_CONFIG_FILE}
+                    sed -i -e \"s/JENKINS_INJECTED_CRON_PASSWORD/${GSDS_DB_CRON_CREDENTIALS_PSW}/g\" scripts/config/${GSDS_CONFIG_FILE}
+                    sed -i -e \"s/JENKINS_INJECTED_RO_USERNAME/${GSDS_DB_RO_CREDENTIALS_USR}/g\" scripts/config/${GSDS_CONFIG_FILE}
+                    sed -i -e \"s/JENKINS_INJECTED_RO_PASSWORD/${GSDS_DB_RO_CREDENTIALS_PSW}/g\" scripts/config/${GSDS_CONFIG_FILE}
+                    sed -i -e \"s/JENKINS_INJECTED_PCC_USERNAME/${GSDS_PCC_DB_CREDENTIALS_USR}/g\" scripts/config/${GSDS_CONFIG_FILE}
+                    sed -i -e \"s/JENKINS_INJECTED_PCC_PASSWORD/${GSDS_PCC_DB_CREDENTIALS_PSW}/g\" scripts/config/${GSDS_CONFIG_FILE}
+                    sed -i -e \"s/JENKINS_INJECTED_AD_PASSWORD/${GSDS_SH_AD_CREDENTIALS_PSW}/g\" scripts/config/${GSDS_CONFIG_FILE}
+                    set -x
+                """
+            }
+            */
+        }
+        stage('Deploy') {
+            steps {
+                sh '''
+                    echo "BUILD_TIME=${START_TIME}" > http/buildinfo.txt
+                    echo "JOB_NAME=${JOB_NAME}" >> http/buildinfo.txt
+                    echo "BUILD_NUMBER=${BUILD_NUMBER}" >> http/buildinfo.txt
+                    echo "GIT_BRANCH=${GIT_BRANCH}" >> http/buildinfo.txt
+                    echo "GIT_COMMIT=${GIT_COMMIT}" >> http/buildinfo.txt
+                '''
+                echo "Deploying to ${DEPLOY_FQDN}"
+                sh '''
+                    echo 'http/src/' > rsync.excludes
+                    echo '.gitignore' >> rsync.excludes
+                    echo '.gitreview' >> rsync.excludes
+                    echo 'Jenkinsfile' >> rsync.excludes
+                    echo 'package.json' >> rsync.excludes
+                    echo 'README.md' >> rsync.excludes
+                    echo 'http/Gruntfile.js' >> rsync.excludes
+                    echo 'Gruntfile.js' >> rsync.excludes
+                    echo 'package.json' >> rsync.excludes
+                    echo 'rsync.excludes' >> rsync.excludes
+                    echo '.git' >> rsync.excludes
+                    echo 'data/inc/*' >> rsync.excludes
+                    echo 'data/log/*' >> rsync.excludes
+                    echo 'data/reports/*' >> rsync.excludes
+                    echo 'data/reports/*/*' >> rsync.excludes
+                    echo 'data/tmp/*' >> rsync.excludes
+                    echo 'data/work/*' >> rsync.excludes
+                    echo '.gitkeep' >> rsync.excludes
+                '''
+                sh """
+                    rsync --owner --group --perms --recursive --delete --itemize-changes \\
+                        --log-file=/tmp/rsyncd-${JOB_NAME}-${BUILD_NUMBER}.log \\
+                        --checksum --include='data/**/*/' --exclude-from=rsync.excludes \\
+                        . jenkins@${DEPLOY_FQDN}:/var/www/gsds_core
+                """
+            }
+        }
+        
+    }
+    post {
+        failure {
+            mail (to: 'lpedley@good-sam.com',
+                 subject: "Job '${JOB_NAME}' (${BUILD_NUMBER}) Failed",
+                 body: "Please go to ${BUILD_URL} and verify the build");
+        }
+    }
+}
