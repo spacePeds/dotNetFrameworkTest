@@ -23,7 +23,7 @@ pipeline {
                 script {
                     gv = load "script.groovy"
                 }
-                cleanWs()
+                //MYcleanWs()
             }
         }
         stage('Environment Setup') {
@@ -36,13 +36,24 @@ pipeline {
                     }
                     environment {
                         //bind the credentials to your env variables
-                        GSDS_DB_WEB_TEMP_CREDENTIALS = "My test credential. Shhh!"
+                        PROJECT_CREDENTIALS = credentials('MY_SECRET_CREDENTIALS')
                         
                     }
                     steps {
                         echo "building branch: ${BRANCH_NAME}"
                         script {
-                            env.GSDS_DB_WEB_CREDENTIALS_PSW = "${GSDS_DB_WEB_TEMP_CREDENTIALS_PSW}"
+                            //need to split the username and password credentials
+                            //method one:
+                            env.PROJECT_PASSWORD = "${PROJECT_CREDENTIALS_PSW}"
+                            //echo "Password 2: ${PROJECT_PASSWORD}"
+
+                            //method two, use a wrapper:
+                            withCredentials([
+                                usernamePassword(credentials: 'MY_SECRET_CREDENTIALS', usernameVariable: PROJECT_USER, passwordVariable: PROJECT_PASSWORD)
+                            ]) {
+                                echo "Username 2: ${PROJECT_USER}"
+                                echo "Password 2: ${PROJECT_PASSWORD}"
+                            }
                             env.DEPLOY_FQDN = 'somepath.com'
                             env.GSDS_CONFIG_FILE = 'dev.conf'
                         }
