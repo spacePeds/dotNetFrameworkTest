@@ -74,14 +74,14 @@ pipeline {
                 """
             }
         }
-        stage('Build') {
-            steps {
+        //stage('Build') {
+        //    steps {
                 //script {
                 //    gv.buildApp()
                 //}
-            }
+        //    }
             
-        }
+        //}
     }
     post {
         failure {
