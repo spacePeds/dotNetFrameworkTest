@@ -20,6 +20,7 @@ pipeline {
     stages {
         stage("init and Clean Workspace") {
             steps {
+                echo "load external groovy script"
                 //script {
                 //    gv = load "script.groovy"
                 //}
