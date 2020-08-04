@@ -20,9 +20,9 @@ pipeline {
     stages {
         stage("init and Clean Workspace") {
             steps {
-                script {
-                    gv = load "script.groovy"
-                }
+                //script {
+                //    gv = load "script.groovy"
+                //}
                 //MYcleanWs()
             }
         }
@@ -36,7 +36,7 @@ pipeline {
                     }
                     environment {
                         //bind the credentials to your env variables
-                        PROJECT_CREDENTIALS = credentials('MY_SECRET_CREDENTIALS')
+                        PROJECT_CREDENTIALS_TEMP = credentials('MY_SECRET_CREDENTIALS')
                         
                     }
                     steps {
@@ -44,29 +44,40 @@ pipeline {
                         script {
                             //need to split the username and password credentials
                             //method one:
-                            env.PROJECT_PASSWORD = "${PROJECT_CREDENTIALS_PSW}"
+                            env.PROJECT_USERNAME = "${PROJECT_CREDENTIALS_TEMP_USR}"
+                            env.PROJECT_PASSWORD = "${PROJECT_CREDENTIALS_TEMP_PSW}"
+                            env.TEST_CONFIG_FILE = 'custom-dev.config'
                             //echo "Password 2: ${PROJECT_PASSWORD}"
 
                             //method two, use a wrapper:
-                            withCredentials([
-                                usernamePassword(credentials: 'MY_SECRET_CREDENTIALS', usernameVariable: PROJECT_USER, passwordVariable: PROJECT_PASSWORD)
-                            ]) {
-                                echo "Username 2: ${PROJECT_USER}"
-                                echo "Password 2: ${PROJECT_PASSWORD}"
-                            }
-                            env.DEPLOY_FQDN = 'somepath.com'
-                            env.GSDS_CONFIG_FILE = 'dev.conf'
+                            //withCredentials([
+                            //    usernamePassword(credentials: 'MY_SECRET_CREDENTIALS', usernameVariable: PROJECT_USER, passwordVariable: PROJECT_PASSWORD)
+                            //]) {
+                            //    echo "Username 2: ${PROJECT_USER}"
+                            //    echo "Password 2: ${PROJECT_PASSWORD}"
+                            //}
+                            //env.DEPLOY_FQDN = 'somepath.com'
+                            //env.GSDS_CONFIG_FILE = 'dev.conf'
                         }
                     }
                 }
                 
             }
         }
+        stage('Inject Credentials') {
+            steps {
+                sh """
+                    set +x
+                    sed -i -e \"s/JENKINS_INJECTED_VALUE/${PROJECT_PASSWORD}/g\" dotNetFrameworkTest/config/${TEST_CONFIG_FILE}
+                    set -x
+                """
+            }
+        }
         stage('Build') {
             steps {
-                script {
-                    gv.buildApp()
-                }
+                //script {
+                //    gv.buildApp()
+                //}
             }
             
         }

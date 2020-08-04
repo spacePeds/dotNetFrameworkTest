@@ -138,6 +138,10 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Jenkinsfile" />
+    <Content Include="config\custom-local.config" />
+    <Content Include="config\custom-dev.config" />
+    <Content Include="config\custom-test.config" />
+    <Content Include="config\custom-prod.config" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
     <Content Include="Scripts\jquery-3.4.1.min.js" />

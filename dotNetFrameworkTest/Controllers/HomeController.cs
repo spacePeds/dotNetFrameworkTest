@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Configuration;
 
 namespace dotNetFrameworkTest.Controllers
 {
@@ -15,7 +16,7 @@ namespace dotNetFrameworkTest.Controllers
 
         public ActionResult About()
         {
-            ViewBag.Message = "Your application description page.";
+            ViewBag.Message = "Your application description page. \nI am injecting '"+ReadSetting("MyCustomSetting")+"' from Jenkins!";
 
             return View();
         }
@@ -25,6 +26,20 @@ namespace dotNetFrameworkTest.Controllers
             ViewBag.Message = "Your contact page.";
 
             return View();
+        }
+
+        private string ReadSetting(string key)
+        {
+            try
+            {
+                var appSettings = ConfigurationManager.AppSettings;
+                string result = appSettings[key] ?? "Not Found";
+                return result;
+            }
+            catch (ConfigurationErrorsException)
+            {
+                return "Error reading app settings";
+            }
         }
     }
 }  
