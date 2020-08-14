@@ -67,12 +67,42 @@ pipeline {
         }
         stage('Inject Credentials') {
             steps {
-                sh """
-                    set +x
-                    sed -i -e \"s/custom-local.config/${ENV_CONFIG_FILE}/g\" dotNetFrameworkTest/Web.config
-                    sed -i -e \"s/JENKINS_INJECTED_VALUE/${PROJECT_PASSWORD}/g\" dotNetFrameworkTest/config/${ENV_CONFIG_FILE}
-                    set -x
-                """
+                contentReplace (
+                    configs: [
+                        //Set the proper configuration file to use in the specified environment
+                        fileContentReplaceConfig(
+                            configs: [
+                                fileContentReplaceItemConfig(
+                                    search: 'custom-local.config',
+                                    replace: "${ENV_CONFIG_FILE}",
+                                    matchCount: 1
+                                )
+                            ],
+                            fileEncoding: 'UTF-8',
+                            filePath: 'dotNetFrameworkTest/Web.config'
+                        ),
+                        //inject the specified configuration file with the proper credentials from jenkins
+                        fileContentReplaceConfig(
+                            configs: [
+                                fileContentReplaceItemConfig(
+                                    search: 'JENKINS_INJECTED_VALUE',
+                                    replace: "${PROJECT_PASSWORD}",
+                                    matchCount: 1
+                                )
+                            ],
+                            fileEncoding: 'UTF-8',
+                            filePath: "dotNetFrameworkTest/config/${ENV_CONFIG_FILE}"
+                        )
+                    ]
+                )
+                
+
+                // sh """
+                //     set +x
+                //     sed -i -e \"s/custom-local.config/${ENV_CONFIG_FILE}/g\" dotNetFrameworkTest/Web.config
+                //     sed -i -e \"s/JENKINS_INJECTED_VALUE/${PROJECT_PASSWORD}/g\" dotNetFrameworkTest/config/${ENV_CONFIG_FILE}
+                //     set -x
+                // """
             }
         }
         //stage('Build') {
