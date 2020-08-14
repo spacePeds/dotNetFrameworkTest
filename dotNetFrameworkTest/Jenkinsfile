@@ -47,17 +47,15 @@ pipeline {
                             env.PROJECT_USERNAME = "${PROJECT_CREDENTIALS_TEMP_USR}"
                             env.PROJECT_PASSWORD = "${PROJECT_CREDENTIALS_TEMP_PSW}"
                             env.ENV_CONFIG_FILE = 'custom-dev.config'
-                            //echo "Password 2: ${PROJECT_PASSWORD}"
 
                             //method two, use a wrapper:
-                            //withCredentials([
-                            //    usernamePassword(credentials: 'MY_SECRET_CREDENTIALS', usernameVariable: PROJECT_USER, passwordVariable: PROJECT_PASSWORD)
-                            //]) {
-                            //    echo "Username 2: ${PROJECT_USER}"
-                            //    echo "Password 2: ${PROJECT_PASSWORD}"
-                            //}
-                            //env.DEPLOY_FQDN = 'somepath.com'
-                            //env.GSDS_CONFIG_FILE = 'dev.conf'
+                            withCredentials([
+                               usernamePassword(credentials: 'PROJECT_CREDENTIALS_TEMP', usernameVariable: PROJECT_USER, passwordVariable: PROJECT_PASSWORD)
+                            ) {
+                                echo "Username 2: ${PROJECT_USER}"
+                                echo "Password 2: ${PROJECT_PASSWORD}"
+                            }
+                            
                         }
                     }
                 }
