@@ -99,14 +99,15 @@ pipeline {
                 //bat "dotnet restore dotNetFrameworkTest\\dotNetFrameworkTest.csproj"
                 //framework version
                 bat "D:\\jenkinsWork\\nuget.exe locals all -clear"
-                bat "D:\jenkinsWork\nuget.exe restore"
+                bat "D:\\jenkinsWork\\nuget.exe restore"
             }
         }
-        // stage('Clean'){
-        //     steps{
-        //         bat "dotnet clean dotNetFrameworkTest\\dotNetFrameworkTest.csproj"
-        //     }
-        // }
+        stage('Clean'){
+            steps{
+             //core version   
+             bat "dotnet clean dotNetFrameworkTest\\dotNetFrameworkTest.csproj"
+            }
+        }
         //stage('Build') {
         //    steps {
         //         bat "dotnet build dotNetFrameworkTest\\dotNetFrameworkTest.csproj --configuration Release"
