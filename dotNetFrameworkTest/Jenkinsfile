@@ -49,13 +49,12 @@ pipeline {
                             env.ENV_CONFIG_FILE = 'custom-dev.config'
 
                             //method two, use a wrapper:
-                            withCredentials([
-                               usernamePassword(credentials: 'PROJECT_CREDENTIALS_TEMP', usernameVariable: PROJECT_USER, passwordVariable: PROJECT_PASSWORD)
-                            ]) {
-                                echo "Username 2: ${PROJECT_USER}"
-                                echo "Password 2: ${PROJECT_PASSWORD}"
-                            }
-                            
+                            //withCredentials([
+                            //   usernamePassword(credentials: 'PROJECT_CREDENTIALS_TEMP', usernameVariable: PROJECT_USER, passwordVariable: PROJECT_PASSWORD)
+                            //]) {
+                            //    echo "Username 2: ${PROJECT_USER}"
+                            //    echo "Password 2: ${PROJECT_PASSWORD}"
+                            //}                    
                         }
                     }
                 }
@@ -94,20 +93,17 @@ pipeline {
                 )
             }
         }
-        //stage('Publish'){
-            //dotNetFrameworkTest\\dotNetFrameworkTest.csproj
-            //steps{
-        // stage('Restore packages'){
-        //     steps{
-        //         //.dotNet core version
-        //         bat "dotnet restore dotNetFrameworkTest\\dotNetFrameworkTest.csproj"
+        stage('Restore packages'){
+            steps{
+                //.dotNet core version
+                bat "dotnet restore dotNetFrameworkTest\\dotNetFrameworkTest.csproj"
         //         //framework version
         //         // bat """
         //         //     "D:\jenkinsWork\nuget.exe locals all -clear"
         //         // "D:\jenkinsWork\nuget.exe restore"
         //         // """
-        //     }
-        // }
+            }
+        }
         // stage('Clean'){
         //     steps{
         //         bat "dotnet clean dotNetFrameworkTest\\dotNetFrameworkTest.csproj"
