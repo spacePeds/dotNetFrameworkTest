@@ -54,7 +54,7 @@ pipeline {
                             ) {
                                 echo "Username 2: ${PROJECT_USER}"
                                 echo "Password 2: ${PROJECT_PASSWORD}"
-                            }
+                            }]
                             
                         }
                     }
