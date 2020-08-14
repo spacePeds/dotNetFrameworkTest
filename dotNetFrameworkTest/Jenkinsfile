@@ -21,9 +21,9 @@ pipeline {
         stage("init and Clean Workspace") {
             steps {
                 //load external groovy script
-                //script {
-                //    gv = load "script.groovy"
-                //}
+                script {
+                    gv = load "script.groovy"
+                }
             }
         }
         stage('Environment Setup') {
@@ -125,9 +125,9 @@ pipeline {
                 bat "dotnet build dotNetFrameworkTest\\dotNetFrameworkTest.csproj --configuration Release"
             }
         }
-        stage('Publish'){
+        //stage('Publish'){
             //dotNetFrameworkTest\\dotNetFrameworkTest.csproj
-            steps{
+            //steps{
                 //.net core version
                 //bat "dotnet publish YourProjectPath\\Your_Project.csproj "
 
@@ -136,17 +136,10 @@ pipeline {
                 //https://blog.couchbase.com/continuous-deployment-with-jenkins-and-net/
 
                 //"C:\\Program Files (x86)\\IIS\\Microsoft Web Deploy V3\\msdeploy.exe" -verb:sync -source:package="dotNetFrameworkTest.zip" -dest:auto,computerName="192.168.1.30>",userName=administrator,password="supersecret",authType=NTLM -allowUntrusted=true
-
-            }
-        }
-        //stage('Build') {
-        //    steps {
-                //script {
-                //    gv.buildApp()
-                //}
-        //    }
-            
+                //gv.buildApp()
+            //}
         //}
+        
     }
     post {
         failure {
