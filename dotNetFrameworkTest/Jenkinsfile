@@ -111,7 +111,7 @@ pipeline {
         stage('Build') {
             steps {
                 //core version
-                bat "dotnet build dotNetFrameworkTest\\dotNetFrameworkTest.csproj --configuration Release"
+                //bat "dotnet build dotNetFrameworkTest\\dotNetFrameworkTest.csproj --configuration Release"
                 //gv.buildApp()
                 bat """
                     "D:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe" /t:rebuild,restore
