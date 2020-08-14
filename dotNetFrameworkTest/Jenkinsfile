@@ -102,18 +102,22 @@ pipeline {
                 bat "D:\\jenkinsWork\\nuget.exe restore"
             }
         }
-        stage('Clean'){
-            steps{
-             //core version   
-             bat "dotnet clean dotNetFrameworkTest\\dotNetFrameworkTest.csproj"
+        //stage('Clean'){
+        //    steps{
+        //     //core version   
+        //     bat "dotnet clean dotNetFrameworkTest\\dotNetFrameworkTest.csproj"
+        //    }
+        //}
+        stage('Build') {
+            steps {
+                //core version
+                bat "dotnet build dotNetFrameworkTest\\dotNetFrameworkTest.csproj --configuration Release"
+                //gv.buildApp()
+                bat """
+                    "D:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\MSBuild\Current\Bin\MSBuild.exe" /t:rebuild,restore
+                """
             }
         }
-        //stage('Build') {
-        //    steps {
-        //         bat "dotnet build dotNetFrameworkTest\\dotNetFrameworkTest.csproj --configuration Release"
-                //gv.buildApp()
-                //}
-        //    }
         // stage('Publish'){
         //     //dotNetFrameworkTest\\dotNetFrameworkTest.csproj
         //     steps{
