@@ -20,11 +20,10 @@ pipeline {
     stages {
         stage("init and Clean Workspace") {
             steps {
-                echo "load external groovy script"
+                //load external groovy script
                 //script {
                 //    gv = load "script.groovy"
                 //}
-                //MYcleanWs()
             }
         }
         stage('Environment Setup') {
@@ -103,6 +102,41 @@ pipeline {
                 //     sed -i -e \"s/JENKINS_INJECTED_VALUE/${PROJECT_PASSWORD}/g\" dotNetFrameworkTest/config/${ENV_CONFIG_FILE}
                 //     set -x
                 // """
+            }
+        }
+        stage('Restore packages'){
+            steps{
+                //.dotNet core version
+                bat "dotnet restore dotNetFrameworkTest\\dotNetFrameworkTest.csproj"
+                //framework version
+                // bat """
+                //     "D:\jenkinsWork\nuget.exe locals all -clear"
+                // "D:\jenkinsWork\nuget.exe restore"
+                // """
+            }
+        }
+        stage('Clean'){
+            steps{
+                bat "dotnet clean dotNetFrameworkTest\\dotNetFrameworkTest.csproj"
+            }
+        }
+        stage('Build'){
+            steps{
+                bat "dotnet build dotNetFrameworkTest\\dotNetFrameworkTest.csproj --configuration Release"
+            }
+        }
+        stage('Publish'){
+            //dotNetFrameworkTest\\dotNetFrameworkTest.csproj
+            steps{
+                //.net core version
+                //bat "dotnet publish YourProjectPath\\Your_Project.csproj "
+
+                //framework version
+                //dotNetFrameworkTest\\dotNetFrameworkTest.csproj
+                //https://blog.couchbase.com/continuous-deployment-with-jenkins-and-net/
+
+                //"C:\\Program Files (x86)\\IIS\\Microsoft Web Deploy V3\\msdeploy.exe" -verb:sync -source:package="dotNetFrameworkTest.zip" -dest:auto,computerName="192.168.1.30>",userName=administrator,password="supersecret",authType=NTLM -allowUntrusted=true
+
             }
         }
         //stage('Build') {
