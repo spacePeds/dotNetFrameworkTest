@@ -22,7 +22,7 @@ pipeline {
             steps {
                 //load external groovy script
                 script {
-                    gv = load "script.groovy"
+                    gv = load "dotNetFrameworkTest/script.groovy"
                 }
             }
         }
