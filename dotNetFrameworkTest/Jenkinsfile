@@ -94,8 +94,9 @@ pipeline {
                         )
                     ]
                 )
-                
-        stage('Publish'){
+            }
+        }
+        //stage('Publish'){
             //dotNetFrameworkTest\\dotNetFrameworkTest.csproj
             //steps{
         // stage('Restore packages'){
